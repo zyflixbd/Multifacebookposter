@@ -1,0 +1,79 @@
+name: Facebook Multi-Page Auto Video Poster
+
+on:
+  # ── 4 posts per day per page (Kolkata IST) ────────────────────────────────
+  #   08:00 AM IST = 02:30 UTC
+  #   12:00 PM IST = 06:30 UTC
+  #   07:00 PM IST = 13:30 UTC
+  #   10:00 PM IST = 16:30 UTC
+  schedule:
+    - cron: "30 2  * * *"   # 08:00 AM IST  Morning
+    - cron: "30 6  * * *"   # 12:00 PM IST  Noon
+    - cron: "30 13 * * *"   # 07:00 PM IST  Evening
+    - cron: "30 16 * * *"   # 10:00 PM IST  Night
+
+  workflow_dispatch:   # manual trigger for testing
+
+jobs:
+  post-to-all-pages:
+    name: Post 1 Video to Every Page
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run poster script
+        env:
+          # ── Shared Google credentials ────────────────────────────────
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_API_KEY:         ${{ secrets.GOOGLE_API_KEY }}
+
+          # ── Facebook Page 1 ─────────────────────────────────────────
+          PAGE_1_TOKEN: ${{ secrets.PAGE_1_TOKEN }}
+          PAGE_1_ID:    ${{ secrets.PAGE_1_ID }}
+
+          # ── Facebook Page 2 ─────────────────────────────────────────
+          PAGE_2_TOKEN: ${{ secrets.PAGE_2_TOKEN }}
+          PAGE_2_ID:    ${{ secrets.PAGE_2_ID }}
+
+          # ── Facebook Page 3 ─────────────────────────────────────────
+          PAGE_3_TOKEN: ${{ secrets.PAGE_3_TOKEN }}
+          PAGE_3_ID:    ${{ secrets.PAGE_3_ID }}
+
+          # ── Facebook Page 4 ─────────────────────────────────────────
+          PAGE_4_TOKEN: ${{ secrets.PAGE_4_TOKEN }}
+          PAGE_4_ID:    ${{ secrets.PAGE_4_ID }}
+
+          # ── Facebook Page 5 ─────────────────────────────────────────
+          PAGE_5_TOKEN: ${{ secrets.PAGE_5_TOKEN }}
+          PAGE_5_ID:    ${{ secrets.PAGE_5_ID }}
+
+          # ── Facebook Page 6 ─────────────────────────────────────────
+          PAGE_6_TOKEN: ${{ secrets.PAGE_6_TOKEN }}
+          PAGE_6_ID:    ${{ secrets.PAGE_6_ID }}
+
+        run: python poster.py
+
+      - name: Commit posted.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posted.json
+          git diff --staged --quiet || git commit -m "chore: update posted.json [skip ci]"
+          git push
