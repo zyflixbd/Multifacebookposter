@@ -1,18 +1,7 @@
 name: Facebook Multi-Page Auto Video Poster
 
 on:
-  # ── 4 posts per day per page (Kolkata IST) ────────────────────────────────
-  #   08:00 AM IST = 02:30 UTC
-  #   12:00 PM IST = 06:30 UTC
-  #   07:00 PM IST = 13:30 UTC
-  #   10:00 PM IST = 16:30 UTC
-  schedule:
-    - cron: "30 2  * * *"   # 08:00 AM IST  Morning
-    - cron: "30 6  * * *"   # 12:00 PM IST  Noon
-    - cron: "30 13 * * *"   # 07:00 PM IST  Evening
-    - cron: "30 16 * * *"   # 10:00 PM IST  Night
-
-  workflow_dispatch:   # manual trigger for testing
+  workflow_dispatch:   # manual trigger only
 
 jobs:
   post-to-all-pages:
